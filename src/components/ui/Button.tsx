@@ -1,5 +1,5 @@
 import React from "react"
-import { Pressable, Text } from "react-native"
+import { Pressable, Text, TouchableOpacity } from "react-native"
 
 type Props = {
   onPress: () => void
@@ -9,7 +9,8 @@ type Props = {
 
 const Button = ({ onPress, className, label = "Button" }: Props) => {
   return (
-    <Pressable
+    <TouchableOpacity
+      activeOpacity={0.8}
       className={
         "flex items-center justify-center h-16 w-full rounded-xl bg-indigo-500 " +
         className
@@ -17,7 +18,7 @@ const Button = ({ onPress, className, label = "Button" }: Props) => {
       onPress={onPress}
     >
       <Text className="font-NunitoSansBold text-white text-xl">{label}</Text>
-    </Pressable>
+    </TouchableOpacity>
   )
 }
 
