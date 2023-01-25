@@ -1,12 +1,19 @@
 import React from "react"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import Dashboard from "../screens/Dashboard"
-import { NewspaperIcon, Squares2X2Icon, UserIcon } from "react-native-heroicons/solid"
+import {
+  NewspaperIcon,
+  Squares2X2Icon,
+  UserIcon,
+} from "react-native-heroicons/solid"
 import {
   Squares2X2Icon as Squares2X2OutlineIcon,
   NewspaperIcon as NewspaperOutlineIcon,
   UserIcon as UserOutlineIcon,
 } from "react-native-heroicons/outline"
+import { useAuth } from "../hooks/useAuth"
+import Account from "../screens/Account"
+import Learn from "../screens/Learn"
 
 const Tab = createBottomTabNavigator()
 
@@ -18,6 +25,7 @@ type RouteIcon = {
 }
 
 const BottomTabNavigation = () => {
+  const { connectedUser } = useAuth()
   return (
     <Tab.Navigator
       initialRouteName="Dashboard"
@@ -58,19 +66,35 @@ const BottomTabNavigation = () => {
       />
       <Tab.Screen
         name="Learn"
-        component={Dashboard}
+        component={Learn}
         options={{
           title: "Comprendre",
           headerShown: false,
         }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault()
+            connectedUser
+              ? navigation.navigate("Learn")
+              : navigation.navigate("NotLoggedIn")
+          },
+        })}
       />
       <Tab.Screen
         name="Account"
-        component={Dashboard}
+        component={Account}
         options={{
           title: "Mon compte",
           headerShown: false,
         }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault()
+            connectedUser
+              ? navigation.navigate("Account")
+              : navigation.navigate("NotLoggedIn")
+          },
+        })}
       />
     </Tab.Navigator>
   )

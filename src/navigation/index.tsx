@@ -1,14 +1,18 @@
-import React from "react"
+import React, { useEffect } from "react"
 import {
   NavigationContainer,
   NavigationProp,
   ParamListBase,
 } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
-import { useEffect } from "react"
-import Loader from "../components/ui/Loader"
 import Welcome from "../screens/not_registered/Welcome"
 import BottomTabNavigation from "./bottomTabNavigation"
+import CreateMood from "../screens/CreateMood"
+import { useAuth } from "../hooks/useAuth"
+import Loader from "../components/ui/Loader"
+import NotLoggedIn from "../screens/not_registered/NotLoggedIn"
+import Login from "../screens/not_registered/Login"
+import Register from "../screens/not_registered/Register"
 
 const Stack = createNativeStackNavigator()
 
@@ -16,14 +20,21 @@ type Props = {
   navigation: NavigationProp<ParamListBase>
 }
 
+// If the user is logged in, redirect to the bottom tab navigation
 const AuthRedirection = ({ navigation }: Props) => {
-  const user = null
+  const { checkAuth, connectedUser } = useAuth()
+
   useEffect(() => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: user ? "BottomTabNavigation" : "Welcome" }],
+    checkAuth().then(() => {
+      console.log("connectedUser", connectedUser);
+      
+      navigation.reset({
+        index: 0,
+        routes: [{ name: connectedUser ? "BottomTabNavigation" : "Welcome" }],
+      })
     })
   }, [])
+
   return <Loader />
 }
 
@@ -44,7 +55,27 @@ const StackNavigation = () => {
           component={BottomTabNavigation}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="CreateMood"
+          component={CreateMood}
+          options={{ headerShown: false, animation: "slide_from_bottom" }}
+        />
 
+        <Stack.Screen
+          name="NotLoggedIn"
+          component={NotLoggedIn}
+          options={{ headerShown: false, animation: "slide_from_bottom" }}
+        />
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={Register}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="Welcome"
           component={Welcome}
