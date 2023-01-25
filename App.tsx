@@ -1,13 +1,15 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import * as SplashScreen from "expo-splash-screen"
 import StackNavigation from "./src/navigation"
 import { View } from "react-native"
 import { useFonts } from "expo-font"
+import AuthProvider from "./src/hooks/useAuth"
 
 // Keep the splash screen visible while we fetch resources
 // SplashScreen.preventAutoHideAsync()
 
 export default function App() {
+
   const [fontsLoaded] = useFonts({
     "NunitoSans-ExtraBold": require("./assets/fonts/NunitoSans-ExtraBold.ttf"),
     "NunitoSans-Black": require("./assets/fonts/NunitoSans-Black.ttf"),
@@ -16,7 +18,7 @@ export default function App() {
     "NunitoSans-Regular": require("./assets/fonts/NunitoSans-Regular.ttf"),
     "NunitoSans-Light": require("./assets/fonts/NunitoSans-Light.ttf"),
     "NunitoSans-ExtraLight": require("./assets/fonts/NunitoSans-ExtraLight.ttf"),
-    
+
     // "NunitoSans-ExtraBoldItalic": require("./assets/fonts/NunitoSans-ExtraBoldItalic.ttf"),
     // "NunitoSans-BlackItalic": require("./assets/fonts/NunitoSans-BlackItalic.ttf"),
     // "NunitoSans-BoldItalic": require("./assets/fonts/NunitoSans-BoldItalic.ttf"),
@@ -25,14 +27,23 @@ export default function App() {
     // "NunitoSans-LightItalic": require("./assets/fonts/NunitoSans-LightItalic.ttf"),
     // "NunitoSans-ExtraLightItalic": require("./assets/fonts/NunitoSans-ExtraLightItalic.ttf"),
   })
+  const [isAppReady, setIsAppReady] = useState(false)
+
+  useEffect(() => {
+    const waitCheckAuth = async () => {
+      // Do something before splash screen goes away
+      setIsAppReady(true)
+    }
+    waitCheckAuth()
+  }, [])
 
   const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
+    if (fontsLoaded && isAppReady) {
       await SplashScreen.hideAsync()
     }
-  }, [fontsLoaded])
+  }, [fontsLoaded, isAppReady])
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || !isAppReady) {
     return null
   }
 
@@ -40,7 +51,9 @@ export default function App() {
 
   return (
     <View className="flex-1 bg-transparent" onLayout={onLayoutRootView}>
-      <StackNavigation />
+      <AuthProvider>
+        <StackNavigation />
+      </AuthProvider>
     </View>
   )
 }
