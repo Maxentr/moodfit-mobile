@@ -12,12 +12,24 @@ import {
 import { XMarkIcon } from "react-native-heroicons/solid"
 import Button from "../components/ui/Button"
 import DismissKeyboard from "../components/ui/DismissKeyboard"
+import { useAuth } from "../hooks/useAuth"
 
 type Props = NativeStackScreenProps<ParamListBase, "CreateMood">
 
 const CreateMood = ({ navigation }: Props) => {
+  const { connectedUser } = useAuth()
   const [moodValue, setMood] = React.useState(5)
   const [comment, setComment] = React.useState("")
+
+  const handleCreation = () => {
+    if (!connectedUser)
+      navigation.reset({
+        index: 1,
+        routes: [{ name: "BottomTabNavigation" }, { name: "NotLoggedIn" }],
+      })
+    else {
+    }
+  }
 
   return (
     <DismissKeyboard>
@@ -74,7 +86,7 @@ const CreateMood = ({ navigation }: Props) => {
               />
             </View>
           </View>
-          <Button onPress={() => navigation.goBack()} label="Valider" />
+          <Button onPress={handleCreation} label="Valider" />
         </View>
       </SafeAreaView>
     </DismissKeyboard>
