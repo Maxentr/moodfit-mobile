@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "bad-days-counter-mobile",
-    "slug": "bad-days-counter-mobile",
+    "name": "moodfit-mobile",
+    "slug": "moodfit-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
