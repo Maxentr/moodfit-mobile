@@ -41,7 +41,7 @@ const Welcome = ({ navigation }: Props) => {
             asset={require("../../../assets/svg/icon.svg")}
             className="w-32 h-32"
           />
-          <Text className="font-NunitoSansBold text-2xl text-gray-800 mt-4">
+          <Text className="font-NunitoSansBold text-2xl text-center text-gray-800 mt-8">
             Nos valeurs chez MoodFit
           </Text>
           <View className="mt-8 px-8">
