@@ -35,7 +35,8 @@ const Register = ({ navigation }: Props) => {
         },
         body: JSON.stringify(form),
       })
-
+      
+      
       const loginResponse = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: {
@@ -46,14 +47,14 @@ const Register = ({ navigation }: Props) => {
           password: form.password,
         }),
       })
-
+      
       const { accessToken, refreshToken } = await loginResponse.json()
-
+      
       await login(accessToken, refreshToken)
 
       navigation.navigate("BottomTabNavigation", { screen: "Home" })
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 

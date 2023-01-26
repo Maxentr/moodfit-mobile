@@ -58,29 +58,39 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const refreshAccessToken = async () => {
-    const refreshToken = await SecureStore.getItemAsync("RefreshToken")
+    let isAccessTokenRefreshed = false
+    try {
+      const refreshToken = await SecureStore.getItemAsync("RefreshToken")
 
-    // call api to refresh token
-    const response = await fetch(`${API_URL}/auth/refresh`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ refreshToken }),
-    }).then((res) => res.json())
+      // call api to refresh token
+      const response = await fetch(`${API_URL}/auth/refresh`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refreshToken }),
+      })
 
-    // if valid, update access and user
-    if (response?.accessToken) {
-      await updateAccessToken(response.accessToken)
-      updateUser(response.accessToken)
-      return true
-    } else {
-      // if not valid, logout user
-      console.info("logout")
+      const data = await response.json()
 
+      // if valid, update access and user
+      if (data?.accessToken) {
+        await updateAccessToken(data.accessToken)
+        updateUser(data.accessToken)
+        isAccessTokenRefreshed = true
+      } else {
+        // if not valid, logout user
+        console.info("logout")
+
+        await logout()
+        isAccessTokenRefreshed = false
+      }
+    } catch (error) {
+      console.error(error)
       await logout()
-      return false
+      isAccessTokenRefreshed = false
     }
+    return isAccessTokenRefreshed
   }
 
   const checkAuth = async () => {
@@ -94,10 +104,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ accessToken }),
-      }).then((res) => res.json())
+      })
+
+      const data = await response.json()
 
       // if valid, return user data
-      if (response?.isValid === true) {
+      if (data?.isValid === true) {
         updateUser(accessToken)
         isUserValid = true
       } else {
@@ -106,6 +118,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch (error) {
       console.error(error)
+      logout()
     }
     return isUserValid
   }

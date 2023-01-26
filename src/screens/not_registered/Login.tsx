@@ -33,14 +33,13 @@ const Login = ({ navigation }: Props) => {
         },
         body: JSON.stringify(form),
       })
-
       const { accessToken, refreshToken } = await loginResponse.json()
-
+      
       await login(accessToken, refreshToken)
 
       navigation.navigate("BottomTabNavigation", { screen: "Home" })
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 
