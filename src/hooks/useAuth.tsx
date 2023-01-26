@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react"
 import * as SecureStore from "expo-secure-store"
 import jwt_decode from "jwt-decode"
 import { API_URL } from "@env"
+import Loader from "../components/ui/Loader"
 
 type User = {
   id: number
@@ -21,13 +22,15 @@ const AuthContext = createContext({} as AuthContextInterface)
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | undefined>(undefined)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    checkAuth()
+    checkAuth().then(() => setIsLoading(false))
   }, [])
 
   const updateUser = (accessToken: string) => {
     const decodedToken: User = jwt_decode(accessToken)
+
     setUser({
       id: decodedToken.id,
       name: decodedToken.name,
@@ -106,6 +109,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
     return isUserValid
   }
+
+  if (isLoading) return <Loader />
 
   return (
     <AuthContext.Provider
