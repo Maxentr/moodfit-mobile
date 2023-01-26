@@ -1,7 +1,8 @@
+import { API_URL } from "@env"
 import { Slider } from "@miblanchard/react-native-slider"
 import { ParamListBase } from "@react-navigation/native"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import React from "react"
+import React, { useState } from "react"
 import {
   SafeAreaView,
   View,
@@ -17,17 +18,39 @@ import { useAuth } from "../hooks/useAuth"
 type Props = NativeStackScreenProps<ParamListBase, "CreateMood">
 
 const CreateMood = ({ navigation }: Props) => {
-  const { connectedUser } = useAuth()
-  const [moodValue, setMood] = React.useState(5)
-  const [comment, setComment] = React.useState("")
+  const { connectedUser, authFetch } = useAuth()
+  const [moodValue, setMood] = useState(5)
+  const [comment, setComment] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleCreation = () => {
+  const handleCreation = async () => {
     if (!connectedUser)
       navigation.reset({
         index: 1,
         routes: [{ name: "BottomTabNavigation" }, { name: "NotLoggedIn" }],
       })
     else {
+      setIsLoading(true)
+      const response = await authFetch(`${API_URL}/moods/`, {
+        method: "POST",
+        body: JSON.stringify({
+          feeling: moodValue,
+          comment,
+          userId: connectedUser.id,
+        }),
+      })
+
+      if ("data" in response) {
+        // TODO Toast success here
+        setIsLoading(false)
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "BottomTabNavigation" }],
+        })
+      } else if ("error" in response) {
+        // TODO Toast error here
+        setIsLoading(false)
+      }
     }
   }
 
