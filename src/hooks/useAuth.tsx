@@ -16,6 +16,10 @@ type AuthContextInterface = {
   login: (accessToken: string, refreshToken: string) => Promise<void>
   logout: () => Promise<void>
   checkAuth: () => Promise<boolean>
+  authFetch: <T>(
+    input: RequestInfo,
+    init?: RequestInit | undefined,
+  ) => Promise<{ data: T } | { error: unknown }>
 }
 
 const AuthContext = createContext({} as AuthContextInterface)
@@ -123,6 +127,33 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return isUserValid
   }
 
+  const authFetch = async <T,>(
+    input: RequestInfo,
+    init?: RequestInit | undefined,
+  ): Promise<{ data: T } | { error: unknown }> => {
+    try {
+      const accessToken = await SecureStore.getItemAsync("AccessToken")
+      const response = await fetch(input, {
+        ...init,
+        headers: {
+          "Content-Type": "application/json",
+          ...init?.headers,
+          credentials: "include",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      const data = await response.json()
+
+      if (data?.error) {
+        throw data.error
+      }
+
+      return { data }
+    } catch (error) {
+      return { error }
+    }
+  }
+
   if (isLoading) return <Loader />
 
   return (
@@ -132,6 +163,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         login,
         logout,
         checkAuth,
+        authFetch,
       }}
     >
       {children}
