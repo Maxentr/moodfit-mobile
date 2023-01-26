@@ -13,6 +13,7 @@ import Loader from "../components/ui/Loader"
 import NotLoggedIn from "../screens/not_registered/NotLoggedIn"
 import Login from "../screens/not_registered/Login"
 import Register from "../screens/not_registered/Register"
+import Settings from "../screens/Settings"
 
 const Stack = createNativeStackNavigator()
 
@@ -26,8 +27,6 @@ const AuthRedirection = ({ navigation }: Props) => {
 
   useEffect(() => {
     checkAuth().then(() => {
-      console.log("connectedUser", connectedUser);
-      
       navigation.reset({
         index: 0,
         routes: [{ name: connectedUser ? "BottomTabNavigation" : "Welcome" }],
@@ -58,6 +57,11 @@ const StackNavigation = () => {
         <Stack.Screen
           name="CreateMood"
           component={CreateMood}
+          options={{ headerShown: false, animation: "slide_from_bottom" }}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={Settings}
           options={{ headerShown: false, animation: "slide_from_bottom" }}
         />
 
