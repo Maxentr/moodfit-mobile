@@ -11,6 +11,7 @@ import {
   TextInput,
 } from "react-native"
 import { XMarkIcon } from "react-native-heroicons/solid"
+import { useToast } from "react-native-toast-notifications"
 import Button from "../components/ui/Button"
 import DismissKeyboard from "../components/ui/DismissKeyboard"
 import { useAuth } from "../hooks/useAuth"
@@ -19,6 +20,8 @@ type Props = NativeStackScreenProps<ParamListBase, "CreateMood">
 
 const CreateMood = ({ navigation }: Props) => {
   const { connectedUser, authFetch } = useAuth()
+  const toast = useToast()
+
   const [moodValue, setMood] = useState(5)
   const [comment, setComment] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -31,6 +34,7 @@ const CreateMood = ({ navigation }: Props) => {
       })
     else {
       setIsLoading(true)
+
       const response = await authFetch(`${API_URL}/moods/`, {
         method: "POST",
         body: JSON.stringify({
@@ -41,14 +45,25 @@ const CreateMood = ({ navigation }: Props) => {
       })
 
       if ("data" in response) {
-        // TODO Toast success here
+        toast.show("Mood créé avec succès", {
+          type: "success",
+          placement: "top",
+          duration: 3000,
+        })
+
         setIsLoading(false)
         navigation.reset({
           index: 0,
           routes: [{ name: "BottomTabNavigation" }],
         })
       } else if ("error" in response) {
-        // TODO Toast error here
+        if (response.error === "You already sent your mood report today")
+          toast.show("Vous avez déjà envoyé votre mood aujourd'hui", {
+            type: "warning",
+            placement: "top",
+            duration: 3000,
+          })
+
         setIsLoading(false)
       }
     }
