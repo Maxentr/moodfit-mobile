@@ -9,6 +9,7 @@ import { CustomReducer } from "../../utils/CustomReducer"
 import DismissKeyboard from "../../components/ui/DismissKeyboard"
 import { API_URL } from "@env"
 import { useAuth } from "../../hooks/useAuth"
+import { useToast } from "react-native-toast-notifications"
 
 type Props = NativeStackScreenProps<ParamListBase, "Register">
 
@@ -20,6 +21,7 @@ type Form = {
 
 const Register = ({ navigation }: Props) => {
   const { login } = useAuth()
+  const toast = useToast()
   const [form, dispatch] = useReducer(CustomReducer<Form>, {
     name: "",
     email: "",
@@ -35,8 +37,7 @@ const Register = ({ navigation }: Props) => {
         },
         body: JSON.stringify(form),
       })
-      
-      
+
       const loginResponse = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: {
@@ -47,14 +48,30 @@ const Register = ({ navigation }: Props) => {
           password: form.password,
         }),
       })
-      
+
       const { accessToken, refreshToken } = await loginResponse.json()
-      
+
       await login(accessToken, refreshToken)
 
       navigation.navigate("BottomTabNavigation", { screen: "Home" })
     } catch (error) {
-      console.error(error)
+      if (error === "[SyntaxError: JSON Parse error: Unrecognized token '<']") {
+        console.error(
+          "Is the API running ? Do you have the right URL in the .env file ?",
+        )
+        toast.show("Erreur de connexion au serveur", {
+          type: "danger",
+          placement: "top",
+          duration: 3000,
+        })
+      } else {
+        console.error(error)
+        toast.show("Une erreur est survenue", {
+          type: "danger",
+          placement: "top",
+          duration: 3000,
+        })
+      }
     }
   }
 
