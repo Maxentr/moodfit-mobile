@@ -150,6 +150,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       return { data }
     } catch (error) {
+      if (error === "[SyntaxError: JSON Parse error: Unrecognized token '<']") {
+      console.error("Bad url or server is down. Please check your .env file and the url you are trying to fetch.")
+      }
       return { error }
     }
   }

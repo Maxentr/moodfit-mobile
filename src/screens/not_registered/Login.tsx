@@ -44,9 +44,7 @@ const Login = ({ navigation }: Props) => {
       navigation.navigate("BottomTabNavigation", { screen: "Home" })
     } catch (error) {
       if (error === "[SyntaxError: JSON Parse error: Unrecognized token '<']") {
-        console.error(
-          "Is the API running ? Do you have the right URL in the .env file ?",
-        )
+        console.error("Bad url or server is down. Please check your .env file and the url you are trying to fetch.")
         toast.show("Erreur de connexion au serveur", {
           type: "danger",
           placement: "top",
