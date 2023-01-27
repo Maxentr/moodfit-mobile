@@ -4,12 +4,13 @@ import StackNavigation from "./src/navigation"
 import { View } from "react-native"
 import { useFonts } from "expo-font"
 import AuthProvider from "./src/hooks/useAuth"
+import { ToastProvider } from "react-native-toast-notifications"
+import Toast from "./src/components/ui/Toast"
 
 // Keep the splash screen visible while we fetch resources
 // SplashScreen.preventAutoHideAsync()
 
 export default function App() {
-
   const [fontsLoaded] = useFonts({
     "NunitoSans-ExtraBold": require("./assets/fonts/NunitoSans-ExtraBold.ttf"),
     "NunitoSans-Black": require("./assets/fonts/NunitoSans-Black.ttf"),
@@ -52,7 +53,11 @@ export default function App() {
   return (
     <View className="flex-1 bg-transparent" onLayout={onLayoutRootView}>
       <AuthProvider>
-        <StackNavigation />
+        <ToastProvider
+          renderToast={(toast) => <Toast {...toast} />}
+        >
+          <StackNavigation />
+        </ToastProvider>
       </AuthProvider>
     </View>
   )
