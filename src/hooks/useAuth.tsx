@@ -44,8 +44,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const login = async (accessToken: string, refreshToken: string) => {
-    await SecureStore.setItemAsync("AccessToken", JSON.stringify(accessToken))
-    await SecureStore.setItemAsync("RefreshToken", JSON.stringify(refreshToken))
+    await SecureStore.setItemAsync("AccessToken", accessToken)
+    await SecureStore.setItemAsync("RefreshToken", refreshToken)
 
     updateUser(accessToken)
   }
