@@ -4,10 +4,17 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { format } from "date-fns"
 import { fr } from "date-fns/locale"
 import React, { useEffect, useState } from "react"
-import { Text, View, SafeAreaView, Pressable, FlatList } from "react-native"
+import {
+  Text,
+  View,
+  SafeAreaView,
+  Pressable,
+  FlatList,
+  ActivityIndicator,
+  RefreshControl,
+} from "react-native"
 import { Cog8ToothIcon } from "react-native-heroicons/outline"
 import { PencilIcon } from "react-native-heroicons/solid"
-import { getModeForUsageLocation } from "typescript"
 import { useAuth } from "../hooks/useAuth"
 
 type Props = NativeStackScreenProps<ParamListBase, "Account">
@@ -17,23 +24,42 @@ const Account = ({ navigation }: Props) => {
 
   const [moods, setMoods] = useState<any[]>([])
   const [page, setPage] = useState(1)
+  const [loading, setLoading] = useState(false)
+  const [endReached, setEndReached] = useState(false)
+
+  const getMoods = async () => {
+    setLoading(true)
+
+    const response = await authFetch(
+      `${API_URL}/moods/user/${connectedUser?.id}?nb_per_page=10&page=${page}&sort_by=date&order_by=desc`,
+      {
+        method: "GET",
+      },
+    )
+    if ("data" in response) {
+      if ((response.data as any[]).length === 0) setEndReached(true)
+      else setMoods([...moods, ...(response.data as any[])])
+    } else if ("error" in response) {
+      console.error(response.error)
+    }
+    setLoading(false)
+  }
 
   useEffect(() => {
-    const getMoods = async () => {
-      const response = await authFetch(
-        `${API_URL}/moods/user/${connectedUser?.id}?nb_per_page=10&page=${page}&sort_by=date&order_by=desc`,
-        {
-          method: "GET",
-        },
-      )
-      if ("data" in response) {
-        setMoods(response.data as any[])
-      } else if ("error" in response) {
-        console.error(response.error)
-      }
-    }
+    getMoods()
+  }, [page])
+
+  useEffect(() => {
     getMoods()
   }, [])
+
+  const onRefresh = () => {
+    setEndReached(false)
+    setPage(1)
+    if (page !== 1) setMoods([])
+  }
+
+  const onEndReached = () => !loading && !endReached && setPage(page + 1)
 
   const getMoodRate = (rate: number) => {
     const moodRate = {
@@ -50,6 +76,51 @@ const Account = ({ navigation }: Props) => {
     } as { [key: number]: string }
     return `${rate}/10 ${moodRate[rate]}`
   }
+
+  const ListItem = ({ item }: { item: any }) => (
+    <View className="flex flex-col px-6 py-5">
+      <View className="flex flex-row justify-between">
+        <Text className="font-NunitoSansSemiBold text-base text-gray-800">
+          {format(new Date(item.date), "eeee dd MMMM yyyy", {
+            locale: fr,
+          })}
+        </Text>
+        <Text className="font-NunitoSans text-xs text-gray-800">
+          {getMoodRate(item.feeling)}
+        </Text>
+      </View>
+      <Text
+        className="font-NunitoSans text-sm text-gray-800 text-ellipsis"
+        numberOfLines={4}
+      >
+        {item.comment}
+      </Text>
+    </View>
+  )
+
+  const ListEmpty = () => (
+    <View className="flex-1 items-center justify-center">
+      <Text className="font-NunitoSans text-base text-gray-800">
+        Aucune note
+      </Text>
+    </View>
+  )
+
+  const ListerFooter = () => (
+    <View className="flex-1 items-center justify-center">
+      {loading && <ActivityIndicator size="small" color="#6366f1" />}
+      {endReached && (
+        <>
+          <View className="h-[1px] w-full bg-gray-200" />
+          <Text className="px-6 py-5 font-NunitoSans text-base text-gray-800">
+            Vous avez atteint la fin de vos notes ! 🎉
+          </Text>
+        </>
+      )}
+    </View>
+  )
+
+  const ItemSparator = () => <View className="h-[1px] bg-gray-200" />
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -86,29 +157,20 @@ const Account = ({ navigation }: Props) => {
         <FlatList
           data={moods}
           keyExtractor={(item, index) => item + index}
-          renderItem={({ item }) => (
-            <View className="flex flex-col px-6 py-5">
-              <View className="flex flex-row justify-between">
-                <Text className="font-NunitoSansSemiBold text-base text-gray-800">
-                  {format(new Date(item.date), "eeee dd MMMM yyyy", {
-                    locale: fr,
-                  })}
-                </Text>
-                <Text className="font-NunitoSans text-xs text-gray-800">
-                  {getMoodRate(item.feeling)}
-                </Text>
-              </View>
-              <Text
-                className="font-NunitoSans text-sm text-gray-800 text-ellipsis"
-                numberOfLines={4}
-              >
-                {item.comment}
-              </Text>
-            </View>
-          )}
-          ItemSeparatorComponent={() => (
-            <View className="h-[1px] bg-gray-200" />
-          )}
+          ListEmptyComponent={ListEmpty}
+          ListFooterComponent={ListerFooter}
+          renderItem={({ item }) => <ListItem item={item} />}
+          ItemSeparatorComponent={ItemSparator}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              size={1}
+              colors={["#6366f1"]}
+              onRefresh={onRefresh}
+            />
+          }
+          onEndReachedThreshold={0.2}
+          onEndReached={onEndReached}
         />
       </View>
     </SafeAreaView>
