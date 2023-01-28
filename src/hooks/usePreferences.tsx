@@ -2,15 +2,16 @@ import React, { createContext, useContext, useEffect, useState } from "react"
 import Loader from "../components/ui/Loader"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
-export type PREFERENCES_LANGUAGES = "en" | "fr"
+export type LANGUAGES_PREFERENCE = "en" | "fr" | "system"
+export type THEME_PREFERENCE = "light" | "dark" | "system"
 
 type Preferences = {
-  language: PREFERENCES_LANGUAGES
-  theme: "light" | "dark"
+  language: LANGUAGES_PREFERENCE
+  theme: THEME_PREFERENCE
 }
 const DEFAULT_PREFERENCES: Preferences = {
-  language: "en",
-  theme: "light",
+  language: "system",
+  theme: "system",
 }
 
 type PreferencesContextInterface = {
@@ -56,7 +57,7 @@ const PreferencesProvider = ({ children }: { children: React.ReactNode }) => {
       ...preferences,
       [key]: value,
     })
-    
+
     AsyncStorage.setItem(
       "preferences",
       JSON.stringify({
