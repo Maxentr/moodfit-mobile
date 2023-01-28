@@ -6,6 +6,8 @@ import { useFonts } from "expo-font"
 import AuthProvider from "./src/hooks/useAuth"
 import { ToastProvider } from "react-native-toast-notifications"
 import Toast from "./src/components/ui/Toast"
+import "./i18n"
+import PreferencesProvider from "./src/hooks/usePreferences"
 
 // Keep the splash screen visible while we fetch resources
 // SplashScreen.preventAutoHideAsync()
@@ -53,11 +55,11 @@ export default function App() {
   return (
     <View className="flex-1 bg-transparent" onLayout={onLayoutRootView}>
       <AuthProvider>
-        <ToastProvider
-          renderToast={(toast) => <Toast {...toast} />}
-        >
-          <StackNavigation />
-        </ToastProvider>
+        <PreferencesProvider>
+          <ToastProvider renderToast={(toast) => <Toast {...toast} />}>
+            <StackNavigation />
+          </ToastProvider>
+        </PreferencesProvider>
       </AuthProvider>
     </View>
   )

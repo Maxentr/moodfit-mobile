@@ -22,16 +22,17 @@ type Props = NativeStackScreenProps<ParamListBase, "Settings">
 
 const Settings = ({ navigation }: Props) => {
   const { logout } = useAuth()
+  
   const actions = [
     {
       title: "Langues",
       icon: <LanguageIcon className="w-6 h-6 fill-gray-700" color="#374151" />,
-      action: () => navigation.navigate("Languages"),
+      action: () => navigation.navigate("LanguagePreference"),
     },
     {
-      title: "Mes favoris",
+      title: "Affichage",
       icon: <SunIcon className="w-6 h-6 fill-gray-700" color="#374151" />,
-      action: () => navigation.navigate("Favorites"),
+      action: () => navigation.navigate("DisplayPreferences"),
     },
     {
       title: "Me déconnecter",

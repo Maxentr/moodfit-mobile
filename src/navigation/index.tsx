@@ -14,6 +14,7 @@ import NotLoggedIn from "../screens/not_registered/NotLoggedIn"
 import Login from "../screens/not_registered/Login"
 import Register from "../screens/not_registered/Register"
 import Settings from "../screens/Settings"
+import LanguagePreference from "../screens/LanguagePreference"
 
 const Stack = createNativeStackNavigator()
 
@@ -59,10 +60,16 @@ const StackNavigation = () => {
           component={CreateMood}
           options={{ headerShown: false, animation: "slide_from_bottom" }}
         />
+
         <Stack.Screen
           name="Settings"
           component={Settings}
           options={{ headerShown: false, animation: "slide_from_bottom" }}
+        />
+         <Stack.Screen
+          name="LanguagePreference"
+          component={LanguagePreference}
+          options={{ headerShown: false }}
         />
 
         <Stack.Screen
