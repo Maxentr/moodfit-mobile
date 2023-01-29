@@ -11,6 +11,7 @@ import {
   Pressable,
   FlatList,
   ActivityIndicator,
+  Image,
   RefreshControl,
 } from "react-native"
 import { Cog8ToothIcon } from "react-native-heroicons/outline"
@@ -134,7 +135,12 @@ const Account = ({ navigation }: Props) => {
       </View>
       <View className="mt-6 mx-auto">
         <View className="w-[142px] h-[142px] rounded-full border-2 border-indigo-500 p-1.5">
-          <View className="w-full h-full rounded-full bg-gray-200" />
+          {/* <View className="w-full h-full rounded-full bg-gray-200" /> */}
+          <Image
+            className="w-full h-full rounded-full"
+            // source={connectedUser?.avatar}
+            source={require("../../assets/profilPicture.jpg")}
+          />
         </View>
         <View className="mt-2.5 flex flex-row items-center justify-center">
           <Text className="font-NunitoSansBold text-2xl text-indigo-600 left-3">
